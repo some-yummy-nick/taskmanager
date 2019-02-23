@@ -1,19 +1,10 @@
-'use strict';
+import templateFilter from './make-filter.js';
+import makeTask, {cloneTasks} from './make-task.js';
+
 const doc = document;
 const filters = doc.querySelector(`.main__filter`);
+const tasks = doc.querySelector(`.board__tasks`);
 
-const templateFilter = (name, count = 0, active = false) => {
-  return `
-<input type="radio" id="filter__${name}" 
-class="filter__input visually-hidden" name="filter"
- ${count ? `` : `disabled`} 
- ${active ? `checked` : ``} 
-/>
-<label for="filter__${name}" class="filter__label">${name.toUpperCase()}
- <span class="filter__${name}-count">${count}</span>
- </label>
-`;
-};
 const filter = `
  ${templateFilter(`all`, 15, true)}
  ${templateFilter(`overdue`)}
@@ -21,27 +12,18 @@ const filter = `
  ${templateFilter(`favorites`, 7)}
  ${templateFilter(`repeating`, 2)}
  ${templateFilter(`tags`, 6)}
- ${templateFilter(`archive`, 115)}
+ ${templateFilter(`archive`, 112)}
  `;
 
 filters.insertAdjacentHTML(`afterBegin`, filter);
 
-const tasks = doc.querySelector(`.board__tasks`);
-const array = [`.card--edit.card--black`, `.card--pink.card--repeat`, `.card--yellow.card--deadline`, `.card--edit.card--yellow.card--repeat`, `.card--blue`];
-
-const cloneTasks = [];
-
-for (let i = 0; i < array.length; i++) {
-  const task = doc.querySelector(array[i]);
-  const cloneTask = task.cloneNode(true);
-  cloneTasks.push(cloneTask);
-}
-
-const filterLabels = doc.querySelectorAll(`.filter__label`);
+makeTask();
 
 const getRandomInRange = (min, max) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
+
+const filterLabels = doc.querySelectorAll(`.filter__label`);
 
 for (let filterlabel of filterLabels) {
   filterlabel.addEventListener(`click`, () => {
@@ -53,3 +35,4 @@ for (let filterlabel of filterLabels) {
     }
   });
 }
+
