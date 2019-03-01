@@ -1,5 +1,5 @@
 import templateFilter from './make-filter.js';
-import makeTask, {cloneTasks} from './make-task.js';
+import makeTask, {getTask} from './make-task.js';
 
 const doc = document;
 const filters = doc.querySelector(`.main__filter`);
@@ -17,7 +17,14 @@ const filter = `
 
 filters.insertAdjacentHTML(`afterBegin`, filter);
 
-makeTask();
+const renderTasks = (dist, amount) => {
+  dist.insertAdjacentHTML(`beforeend`, new Array(amount)
+    .fill(``)
+    .map(() => makeTask(getTask()))
+    .join(``));
+};
+
+renderTasks(tasks, 7);
 
 const getRandomInRange = (min, max) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -29,10 +36,7 @@ for (let filterlabel of filterLabels) {
   filterlabel.addEventListener(`click`, () => {
     const randomNumber = getRandomInRange(1, 10);
     tasks.innerHTML = ``;
-    for (let i = 0; i <= randomNumber; i++) {
-      const randomAnother = getRandomInRange(1, cloneTasks.length - 1);
-      tasks.append(cloneTasks[randomAnother]);
-    }
+    renderTasks(tasks, randomNumber);
   });
 }
 
