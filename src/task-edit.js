@@ -1,77 +1,36 @@
-const days = (data) => {
-  let allDays = ``;
+import {days, tags, createElement} from './utils';
 
-  for (let day in data) {
 
-    if (data.hasOwnProperty(day)) {
-
-      const oneDay = `<input
-                  class="visually-hidden card__repeat-day-input"
-                  type="checkbox"
-                  id="repeat-${day.toLowerCase()}-6"
-                  name="repeat"
-                  value="${day.toLowerCase()}"
-                  ${data[day] ? `checked` : ``}
-                />
-                <label class="card__repeat-day" for="repeat-${day.toLowerCase()}-6"
-                  >${day.toLowerCase()}</label
-                >`;
-      allDays += oneDay;
-    }
-
+class TaskEdit {
+  constructor(data) {
+    this._title = data.title;
+    this._dueDate = data.dueDate;
+    this._tags = data.tags;
+    this._picture = data.picture;
+    this._color = data.color;
+    this._isDone = data.isDone;
+    this._isFavorite = data.isFavorite;
+    this._repeatingDays = data.repeatingDays;
+    this._element = null;
+    this._onSubmit = null;
+    this._onSubmitButtonClick = this._onSubmitButtonClick.bind(this);
   }
 
-  return allDays;
-
-};
-
-const pickRandom = (arr, count) => {
-  const out = [];
-  const clone = arr.slice(0, arr.length);
-
-  for (let i = 0; i < count; i++) {
-    const pick = Math.floor(Math.random() * clone.length);
-
-    if (clone[pick] !== undefined) {
-      out.push(clone[pick]);
-      clone.splice(pick, 1);
-    }
+  _onSubmitButtonClick() {
+    return typeof this._onSubmit === `function` && this._onSubmit();
   }
-  return out;
-};
 
-const getRandomInt = (min, max) => {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-};
-
-const tags = (data) => {
-  const tagsArray = pickRandom(Array.from(data), getRandomInt(0, 3));
-  let allTags = ``;
-  for (let tag of tagsArray) {
-    const oneTag = `
-    <span class="card__hashtag-inner">
-                          <input
-                            type="hidden"
-                            name="hashtag"
-                            value="${tag}"
-                            class="card__hashtag-hidden-input"
-                          />
-                          <button type="button" class="card__hashtag-name">
-                            #${tag}
-                          </button>
-                          <button type="button" class="card__hashtag-delete">
-                            delete
-                          </button>
-                        </span>`;
-    allTags += oneTag;
+  set onSubmit(fn) {
+    this._onSubmit = fn;
   }
-  return allTags;
-};
 
-const makeTask = (task) => {
+  get element() {
+    return this._element;
+  }
 
-  return `
-<article class="card card--${task.color}">
+  get template() {
+    return `
+        <article class="card card--edit card--${this._color}">
             
             <form class="card__form" method="get">
               <div class="card__inner">
@@ -79,16 +38,16 @@ const makeTask = (task) => {
                   <button type="button" class="card__btn card__btn--edit">
                     edit
                   </button>
-                  ${task.isDone ? `
-                  <button type="button" 
-                  class="card__btn card__btn--archive">
-                   archive
-                  </button>` : ``}
-                  
-                  <button
-                    type="button"
-                    class="card__btn card__btn--favorites${task.isFavorite ? ` card__btn--disabled` : ``}"
-                  >
+                  ${this._isDone ? `
+  
+                    <button type="button" 
+                    class="card__btn card__btn--archive">
+                     archive
+                    </button>` : ``}
+                    
+                    <button
+                      type="button"
+                      class="card__btn card__btn--favorites${this._isFavorite ? ` card__btn--disabled` : ``}">
                     favorites
                   </button>
                 </div>
@@ -103,7 +62,7 @@ const makeTask = (task) => {
                   <label>
                     <textarea
                       class="card__text"
-                      placeholder="${task.title}"
+                      placeholder="${this._title}"
                       name="text"
                     ></textarea>
                   </label>
@@ -121,19 +80,15 @@ const makeTask = (task) => {
                           <input
                             class="card__date"
                             type="text"
- placeholder="${new Date(task.dueDate).toLocaleString(`en-US`, {day: `numeric`})} ${new Date(task.dueDate).toLocaleString(`en-US`, {month: `long`})}"                            name="date"
-                            value="${new Date(task.dueDate).toLocaleString(`en-US`, {day: `numeric`})} ${new Date(task.dueDate).toLocaleString(`en-US`, {month: `long`})}"
-                          />
+ placeholder="${new Date(this._dueDate).toLocaleString(`en-US`, {day: `numeric`})} ${new Date(this._dueDate).toLocaleString(`en-US`, {month: `long`})}" name="date"
+                            value="${new Date(this._dueDate).toLocaleString(`en-US`, {day: `numeric`})} ${new Date(this._dueDate).toLocaleString(`en-US`, {month: `long`})}"/>
                         </label>
                         <label class="card__input-deadline-wrap">
                           <input
                             class="card__time"
                             type="text"
-placeholder="${new Date(task.dueDate).toLocaleString(`en-US`, {hour: `2-digit`, minute: `2-digit`})}"                            name="time"
-                            value="${new Date(task.dueDate).toLocaleString(`en-US`, {
-    hour: `2-digit`,
-    minute: `2-digit`
-  })}"
+placeholder="${new Date(this._dueDate).toLocaleString(`en-US`, {hour: `2-digit`, minute: `2-digit`})}"  name="time"
+value="${new Date(this._dueDate).toLocaleString(`en-US`, {hour: `2-digit`, minute: `2-digit`})}"
                           />
                         </label>
                       </fieldset>
@@ -144,13 +99,13 @@ placeholder="${new Date(task.dueDate).toLocaleString(`en-US`, {hour: `2-digit`, 
 
                       <fieldset class="card__repeat-days">
                         <div class="card__repeat-days-inner">
-                        ${days(task.repeatingDays)}
+                        ${days(this._repeatingDays)}
                         </div>
                       </fieldset>
                     </div>
 
                     <div class="card__hashtag">
-                      <div class="card__hashtag-list">${tags(task.tags)}</div>
+                      <div class="card__hashtag-list">${tags(this._tags)}</div>
                       <label>
                         <input
                           type="text"
@@ -169,7 +124,7 @@ placeholder="${new Date(task.dueDate).toLocaleString(`en-US`, {hour: `2-digit`, 
                       name="img"
                     />
                     <img
-                      src="${task.picture}"
+                      src="${this._picture}"
                       alt="task picture"
                       class="card__img"
                     />
@@ -250,49 +205,30 @@ placeholder="${new Date(task.dueDate).toLocaleString(`en-US`, {hour: `2-digit`, 
               </div>
             </form>
           </article>
-`;
-};
+    `.trim();
+  }
 
+  render() {
+    this._element = createElement(this.template);
+    this.bind();
+    return this._element;
+  }
 
-export {makeTask as default};
+  unrender() {
+    this.unbind();
+    this._element = null;
+  }
 
-function getTask() {
-  const task = {
-    title: [
-      `Изучить теорию`,
-      `Сделать домашку`,
-      `Пройти интенсив на соточку`,
-    ][Math.floor(Math.random() * 3)],
-    dueDate: [
-      Date.now() + 1 + Math.floor(Math.random() * 7) * 24 * 60 * 60 * 1000,
-      Date.now() + 1 - Math.floor(Math.random() * 7) * 24 * 60 * 60 * 1000,
-    ][Math.floor(Math.random() * 2)],
-    tags: new Set([
-      `homework`,
-      `theory`,
-      `practice`,
-      `intensive`,
-      `keks`,
-      `life`,
-      `love`,
-      `friend`,
-    ]),
-    picture: `//picsum.photos/100/100?r=${Math.random()}`,
-    color: [`black`, `yellow`, `blue`, `green`, `pink`][Math.floor(Math.random() * 5)],
-    repeatingDays: {
-      'Mo': true,
-      'Tu': false,
-      'We': true,
-      'Th': false,
-      'Fr': false,
-      'Sa': true,
-      'Su': false,
-    },
-    isFavorite: [true, false][Math.floor(Math.random() * 2)],
-    isDone: [true, false][Math.floor(Math.random() * 2)],
-  };
+  bind() {
+    this._element.querySelector(`.card__form`)
+      .addEventListener(`submit`, this._onSubmitButtonClick);
+  }
 
-  return task;
+  unbind() {
+    this._element.querySelector(`.card__form`)
+      .removeEventListener(`submit`, this._onSubmitButtonClick);
+  }
+
 }
 
-export {getTask};
+export default TaskEdit;

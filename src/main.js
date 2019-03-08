@@ -1,9 +1,12 @@
-import templateFilter from './make-filter.js';
-import makeTask, {getTask} from './make-task.js';
+import templateFilter from './make-filter';
+import {getRandomInRange} from './utils';
+import getTasks from './get-task';
+import Task from './task';
+import TaskEdit from './task-edit';
 
 const doc = document;
 const filters = doc.querySelector(`.main__filter`);
-const tasks = doc.querySelector(`.board__tasks`);
+const tasksContainer = doc.querySelector(`.board__tasks`);
 
 const filter = `
  ${templateFilter(`all`, 15, true)}
@@ -17,26 +20,34 @@ const filter = `
 
 filters.insertAdjacentHTML(`afterBegin`, filter);
 
-const renderTasks = (dist, amount) => {
-  dist.insertAdjacentHTML(`beforeend`, new Array(amount)
-    .fill(``)
-    .map(() => makeTask(getTask()))
-    .join(``));
+const renderTasks = (number) => {
+  for (let i = 0; i < number; i++) {
+    const taskComponent = new Task(getTasks());
+    const editTaskComponent = new TaskEdit(getTasks());
+    tasksContainer.appendChild(taskComponent.render());
+    taskComponent.onEdit = () => {
+      editTaskComponent.render();
+      tasksContainer.replaceChild(editTaskComponent.element, taskComponent.element);
+      taskComponent.unrender();
+    };
+
+    editTaskComponent.onSubmit = () => {
+      taskComponent.render();
+      tasksContainer.replaceChild(taskComponent.element, editTaskComponent.element);
+      editTaskComponent.unrender();
+    };
+  }
 };
 
-renderTasks(tasks, 7);
-
-const getRandomInRange = (min, max) => {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-};
+renderTasks(7);
 
 const filterLabels = doc.querySelectorAll(`.filter__label`);
 
 for (let filterlabel of filterLabels) {
   filterlabel.addEventListener(`click`, () => {
     const randomNumber = getRandomInRange(1, 10);
-    tasks.innerHTML = ``;
-    renderTasks(tasks, randomNumber);
+    tasksContainer.innerHTML = ``;
+    renderTasks(randomNumber);
   });
 }
 
