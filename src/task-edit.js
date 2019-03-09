@@ -1,8 +1,10 @@
-import {days, tags, createElement} from './utils';
+import {days, tags} from './utils';
+import Component from './component';
 
+export default class TaskEdit extends Component {
 
-class TaskEdit {
   constructor(data) {
+    super();
     this._title = data.title;
     this._dueDate = data.dueDate;
     this._tags = data.tags;
@@ -11,7 +13,6 @@ class TaskEdit {
     this._isDone = data.isDone;
     this._isFavorite = data.isFavorite;
     this._repeatingDays = data.repeatingDays;
-    this._element = null;
     this._onSubmit = null;
     this._onSubmitButtonClick = this._onSubmitButtonClick.bind(this);
   }
@@ -22,10 +23,6 @@ class TaskEdit {
 
   set onSubmit(fn) {
     this._onSubmit = fn;
-  }
-
-  get element() {
-    return this._element;
   }
 
   get template() {
@@ -208,27 +205,14 @@ value="${new Date(this._dueDate).toLocaleString(`en-US`, {hour: `2-digit`, minut
     `.trim();
   }
 
-  render() {
-    this._element = createElement(this.template);
-    this.bind();
-    return this._element;
-  }
-
-  unrender() {
-    this.unbind();
-    this._element = null;
-  }
-
-  bind() {
+  createListeners() {
     this._element.querySelector(`.card__form`)
       .addEventListener(`submit`, this._onSubmitButtonClick);
   }
 
-  unbind() {
+  removeListeners() {
     this._element.querySelector(`.card__form`)
       .removeEventListener(`submit`, this._onSubmitButtonClick);
   }
 
 }
-
-export default TaskEdit;
