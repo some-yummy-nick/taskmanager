@@ -29,9 +29,7 @@ const getTasks = () => {
       'Fr': false,
       'Sa': true,
       'Su': false,
-    },
-    isFavorite: [true, false][Math.floor(Math.random() * 2)],
-    isDone: [true, false][Math.floor(Math.random() * 2)],
+    }
   };
   return task;
 };

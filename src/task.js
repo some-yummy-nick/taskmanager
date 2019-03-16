@@ -1,5 +1,6 @@
 import {tags} from './utils';
 import Component from './component';
+const moment = require(`moment`);
 
 export default class Task extends Component {
 
@@ -10,10 +11,22 @@ export default class Task extends Component {
     this._tags = data.tags;
     this._picture = data.picture;
     this._color = data.color;
-    this._isDone = data.isDone;
-    this._isFavorite = data.isFavorite;
+    this._repeatingDays = data.repeatingDays;
     this._onEdit = null;
     this._onEditButtonClick = this._onEditButtonClick.bind(this);
+  }
+
+  update(data) {
+    this._title = data.title;
+    this._dueDate = data.dueDate;
+    this._tags = data.tags;
+    this._picture = data.picture;
+    this._color = data.color;
+    this._repeatingDays = data.repeatingDays;
+  }
+
+  _isRepeated() {
+    return Object.values(this._repeatingDays).some((it) => it === true);
   }
 
   _onEditButtonClick() {
@@ -26,24 +39,23 @@ export default class Task extends Component {
 
   get template() {
     return `
-    <article class="card card--${this._color}">
-            
-            <form class="card__form" method="get">
-              <div class="card__inner">
-                <div class="card__control">
-                  <button type="button" class="card__btn card__btn--edit">
-                    edit
-                  </button>
-                  ${this._isDone ? `
+    <article class="card card--${this._color} ${this._isRepeated() ? `card--repeat` : ``}">
+              
+              <form class="card__form" method="get">
+                <div class="card__inner">
+                  <div class="card__control">
+                    <button type="button" class="card__btn card__btn--edit">
+                      edit
+                    </button>
   
                     <button type="button" 
                     class="card__btn card__btn--archive">
                      archive
-                    </button>` : ``}
+                    </button>
                     
                     <button
                       type="button"
-                      class="card__btn card__btn--favorites${this._isFavorite ? ` card__btn--disabled` : ``}">
+                      class="card__btn card__btn--favorites">
                     favorites
                   </button>
                 </div>
@@ -58,40 +70,18 @@ export default class Task extends Component {
                   <label>
                     <textarea
                       class="card__text"
-                      placeholder="${this._title}"
+                      placeholder="Start typing your text here..."
                       name="text"
-                    ></textarea>
+                    >${this._title}</textarea>
                   </label>
                 </div>
 
                 <div class="card__settings">
                   <div class="card__details">
-                    <div class="card__dates">
-                      <button class="card__date-deadline-toggle" type="button">
-                        date: <span class="card__date-status">no</span>
-                      </button>
-
-                      <fieldset class="card__date-deadline">
-                        <label class="card__input-deadline-wrap">
-                          <input
-                            class="card__date"
-                            type="text"
- placeholder="${new Date(this._dueDate).toLocaleString(`en-US`, {day: `numeric`})} ${new Date(this._dueDate).toLocaleString(`en-US`, {month: `long`})}" name="date"
-                            value="${new Date(this._dueDate).toLocaleString(`en-US`, {day: `numeric`})} ${new Date(this._dueDate).toLocaleString(`en-US`, {month: `long`})}"/>
-                        </label>
-                        <label class="card__input-deadline-wrap">
-                          <input
-                            class="card__time"
-                            type="text"
-placeholder="${new Date(this._dueDate).toLocaleString(`en-US`, {hour: `2-digit`, minute: `2-digit`})}"  name="time"
-value="${new Date(this._dueDate).toLocaleString(`en-US`, {hour: `2-digit`, minute: `2-digit`})}"
-                          />
-                        </label>
-                      </fieldset>
-
                   
-                    </div>
-
+                    <div class="card__dates">
+                    ${moment(this._dueDate).format(`DD MMMM hh:mm`)}
+</div>
                     <div class="card__hashtag">
                       <div class="card__hashtag-list">${tags(this._tags)}</div>
                       <label>
