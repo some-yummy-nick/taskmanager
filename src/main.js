@@ -22,16 +22,26 @@ filters.insertAdjacentHTML(`afterBegin`, filter);
 
 const renderTasks = (number) => {
   for (let i = 0; i < number; i++) {
-    const taskComponent = new Task(getTasks());
-    const editTaskComponent = new TaskEdit(getTasks());
+    const task = getTasks();
+    const taskComponent = new Task(task);
+    const editTaskComponent = new TaskEdit(task);
     tasksContainer.appendChild(taskComponent.render());
+
     taskComponent.onEdit = () => {
+      editTaskComponent.update(task);
       editTaskComponent.render();
       tasksContainer.replaceChild(editTaskComponent.element, taskComponent.element);
       taskComponent.unrender();
     };
 
-    editTaskComponent.onSubmit = () => {
+    editTaskComponent.onSubmit = (newObject) => {
+      task.title = newObject.title;
+      task.tags = newObject.tags;
+      task.color = newObject.color;
+      task.repeatingDays = newObject.repeatingDays;
+      task.dueDate = newObject.dueDate;
+
+      taskComponent.update(task);
       taskComponent.render();
       tasksContainer.replaceChild(taskComponent.element, editTaskComponent.element);
       editTaskComponent.unrender();
