@@ -29,7 +29,8 @@ const getTasks = () => {
       'Fr': false,
       'Sa': true,
       'Su': false,
-    }
+    },
+    deleted: false
   };
   return task;
 };

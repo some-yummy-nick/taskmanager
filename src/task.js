@@ -13,6 +13,7 @@ export default class Task extends Component {
     this._color = data.color;
     this._repeatingDays = data.repeatingDays;
     this._onEdit = null;
+    this.deleted = data.deleted;
     this._onEditButtonClick = this._onEditButtonClick.bind(this);
   }
 
@@ -23,6 +24,7 @@ export default class Task extends Component {
     this._picture = data.picture;
     this._color = data.color;
     this._repeatingDays = data.repeatingDays;
+    this.deleted = data.deleted;
   }
 
   _isRepeated() {

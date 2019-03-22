@@ -21,11 +21,16 @@ const filter = `
 filters.insertAdjacentHTML(`afterBegin`, filter);
 
 const renderTasks = (number) => {
+  tasksContainer.innerHTML = ``;
+
   for (let i = 0; i < number; i++) {
     const task = getTasks();
     const taskComponent = new Task(task);
     const editTaskComponent = new TaskEdit(task);
-    tasksContainer.appendChild(taskComponent.render());
+
+    if (!task.deleted) {
+      tasksContainer.appendChild(taskComponent.render());
+    }
 
     taskComponent.onEdit = () => {
       editTaskComponent.update(task);
@@ -44,6 +49,12 @@ const renderTasks = (number) => {
       taskComponent.update(task);
       taskComponent.render();
       tasksContainer.replaceChild(taskComponent.element, editTaskComponent.element);
+      editTaskComponent.unrender();
+    };
+
+    editTaskComponent.onDelete = () => {
+      task.deleted = true;
+      taskComponent.update(task);
       editTaskComponent.unrender();
     };
   }

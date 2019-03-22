@@ -13,12 +13,14 @@ export default class TaskEdit extends Component {
     this._color = data.color;
     this._repeatingDays = data.repeatingDays;
     this._onSubmit = null;
+    this._onDelete = null;
     this._state.isDate = false;
     this._state.isRepeated = false;
 
     this._onChangeDate = this._onChangeDate.bind(this);
     this._onChangeRepeated = this._onChangeRepeated.bind(this);
     this._onSubmitButtonClick = this._onSubmitButtonClick.bind(this);
+    this._clickOnDelete = this._clickOnDelete.bind(this);
   }
 
   update(data) {
@@ -97,8 +99,16 @@ export default class TaskEdit extends Component {
 
   }
 
+  _clickOnDelete() {
+    return typeof this._onDelete === `function` && this._onDelete();
+  }
+
   set onSubmit(fn) {
     this._onSubmit = fn;
+  }
+
+  set onDelete(fn) {
+    this._onDelete = fn;
   }
 
   get template() {
@@ -301,6 +311,8 @@ ${days(this._repeatingDays)}
         dateFormat: `h:i K`
       });
     }
+    this._element.querySelector(`.card__delete`)
+      .addEventListener(`click`, this._clickOnDelete);
   }
 
   removeListeners() {
