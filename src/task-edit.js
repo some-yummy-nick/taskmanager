@@ -1,6 +1,7 @@
 import {days, tags} from './utils';
 import Component from './component';
 import flatpickr from "flatpickr";
+import moment from 'moment';
 
 export default class TaskEdit extends Component {
 
@@ -32,12 +33,17 @@ export default class TaskEdit extends Component {
   }
 
   static createMapper(target) {
+    let fullDate = ``;
     return {
       hashtag: (value) => target.tags.add(value),
       text: (value) => (target.title = value),
       color: (value) => (target.color = value),
       repeat: (value) => (target.repeatingDays[value] = true),
-      date: (value) => (target.dueDate = value),
+      date: (value) => (fullDate = value),
+      time: (value) => {
+        fullDate += value;
+        target.dueDate = new Date(fullDate);
+      },
     };
   }
 
@@ -162,21 +168,21 @@ export default class TaskEdit extends Component {
                               <input
                                 class="card__date"
                                 type="text"
-     placeholder="${new Date(this._dueDate).toLocaleString(`en-US`, {day: `numeric`})} ${new Date(this._dueDate).toLocaleString(`en-US`, {month: `long`})}" name="date"
-                            value="${new Date(this._dueDate).toLocaleString(`en-US`, {day: `numeric`})} ${new Date(this._dueDate).toLocaleString(`en-US`, {month: `long`})}"/>
-                        </label>
-                        <label class="card__input-deadline-wrap">
-                          <input
-                            class="card__time"
-                            type="text"
-placeholder="${new Date(this._dueDate).toLocaleString(`en-US`, {hour: `2-digit`, minute: `2-digit`})}"  name="time"
-value="${new Date(this._dueDate).toLocaleString(`en-US`, {hour: `2-digit`, minute: `2-digit`})}"
-                          />
-                        </label>
-                      </fieldset>
-
-                      <button class="card__repeat-toggle" type="button">
-                        repeat:<span class="card__repeat-status">${this._state.isRepeated ? `yes` : `no`}</span>
+     placeholder="23 September" name="date"
+                              value="${moment(this._dueDate).format(`DD MMMM`)}"/>
+                          </label>
+                          <label class="card__input-deadline-wrap">
+                            <input
+                              class="card__time"
+                              type="text"
+  placeholder="11:15 PM"  name="time"
+  value="${moment(this._dueDate).format(`LT`)}"
+                            />
+                          </label>
+                        </fieldset>
+  
+                        <button class="card__repeat-toggle" type="button">
+                          repeat:<span class="card__repeat-status">${this._state.isRepeated ? `yes` : `no`}</span>
                         </button>
   
                         <fieldset class="card__repeat-days" ${!this._state.isRepeated && `disabled`}>

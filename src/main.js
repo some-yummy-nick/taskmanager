@@ -1,30 +1,59 @@
-import templateFilter from './make-filter';
-import {getRandomInRange} from './utils';
+import Filter from './filter';
 import getTasks from './get-task';
 import Task from './task';
 import TaskEdit from './task-edit';
+import moment from 'moment';
 
 const doc = document;
-const filters = doc.querySelector(`.main__filter`);
+const filtersContainer = doc.querySelector(`.main__filter`);
 const tasksContainer = doc.querySelector(`.board__tasks`);
 
-const filter = `
- ${templateFilter(`all`, 15, true)}
- ${templateFilter(`overdue`)}
- ${templateFilter(`today`)} 
- ${templateFilter(`favorites`, 7)}
- ${templateFilter(`repeating`, 2)}
- ${templateFilter(`tags`, 6)}
- ${templateFilter(`archive`, 112)}
- `;
+const filtersArray = [`all`, `overdue`, `today`, `repeating`];
 
-filters.insertAdjacentHTML(`afterBegin`, filter);
+const taskCommon = [];
 
-const renderTasks = (number) => {
+for (let i = 0; i < 7; i++) {
+  taskCommon.push(getTasks());
+}
+
+for (let name of filtersArray) {
+  const filter = new Filter({title: `${name}`});
+  filtersContainer.appendChild(filter.render());
+
+  filter.onFilter = (filterName) => {
+    switch (filterName) {
+      case `filter__all`:
+        return renderTasks(taskCommon);
+
+      case `filter__overdue`: {
+        const newArr = taskCommon.filter((it) => it.dueDate < Date.now());
+        return renderTasks(newArr);
+      }
+
+      case `filter__today`: {
+        let newArr = taskCommon.filter((it) => moment(it.dueDate).day() === moment(Date.now()).day());
+        return renderTasks(newArr);
+      }
+
+      case `filter__repeating`: {
+        let newArr = taskCommon.filter((it) => [...Object.entries(it.repeatingDays)]
+          .some((rec) => rec[1]));
+        return renderTasks(newArr);
+      }
+
+      default:
+        return false;
+    }
+
+  };
+
+}
+
+const renderTasks = (tasks) => {
   tasksContainer.innerHTML = ``;
 
-  for (let i = 0; i < number; i++) {
-    const task = getTasks();
+  for (let i = 0; i < tasks.length; i++) {
+    const task = tasks[i];
     const taskComponent = new Task(task);
     const editTaskComponent = new TaskEdit(task);
 
@@ -60,15 +89,4 @@ const renderTasks = (number) => {
   }
 };
 
-renderTasks(7);
-
-const filterLabels = doc.querySelectorAll(`.filter__label`);
-
-for (let filterlabel of filterLabels) {
-  filterlabel.addEventListener(`click`, () => {
-    const randomNumber = getRandomInRange(1, 10);
-    tasksContainer.innerHTML = ``;
-    renderTasks(randomNumber);
-  });
-}
-
+renderTasks(taskCommon);

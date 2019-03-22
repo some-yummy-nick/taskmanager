@@ -1,6 +1,6 @@
 import {tags} from './utils';
 import Component from './component';
-const moment = require(`moment`);
+import moment from 'moment';
 
 export default class Task extends Component {
 
@@ -41,7 +41,7 @@ export default class Task extends Component {
 
   get template() {
     return `
-    <article class="card card--${this._color} ${this._isRepeated() ? `card--repeat` : ``}">
+    <article class="card card--${this._color}${this._isRepeated() ? ` card--repeat` : ``}">
               
               <form class="card__form" method="get">
                 <div class="card__inner">
@@ -116,7 +116,6 @@ export default class Task extends Component {
           </article>
     `.trim();
   }
-
 
   createListeners() {
     this._element.querySelector(`.card__btn--edit`)

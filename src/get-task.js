@@ -7,8 +7,9 @@ const getTasks = () => {
     ][Math.floor(Math.random() * 3)],
     dueDate: [
       Date.now() + 1 + Math.floor(Math.random() * 7) * 24 * 60 * 60 * 1000,
+      Date.now(),
       Date.now() + 1 - Math.floor(Math.random() * 7) * 24 * 60 * 60 * 1000,
-    ][Math.floor(Math.random() * 2)],
+    ][Math.floor(Math.random() * 3)],
     tags: new Set([
       `homework`,
       `theory`,
@@ -21,15 +22,25 @@ const getTasks = () => {
     ]),
     picture: `//picsum.photos/100/100?r=${Math.random()}`,
     color: [`black`, `yellow`, `blue`, `green`, `pink`][Math.floor(Math.random() * 5)],
-    repeatingDays: {
-      'Mo': true,
+    repeatingDays: [{
+      'Mo': false,
       'Tu': false,
-      'We': true,
+      'We': false,
       'Th': false,
       'Fr': false,
-      'Sa': true,
+      'Sa': false,
       'Su': false,
     },
+    {
+      'Mo': false,
+      'Tu': true,
+      'We': false,
+      'Th': false,
+      'Fr': false,
+      'Sa': false,
+      'Su': false,
+    }
+    ][Math.floor(Math.random() * 2)],
     deleted: false
   };
   return task;
