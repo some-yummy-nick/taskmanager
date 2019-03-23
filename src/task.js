@@ -1,6 +1,5 @@
-import {tags} from './utils';
 import Component from './component';
-const moment = require(`moment`);
+import moment from 'moment';
 
 export default class Task extends Component {
 
@@ -13,6 +12,7 @@ export default class Task extends Component {
     this._color = data.color;
     this._repeatingDays = data.repeatingDays;
     this._onEdit = null;
+    this.deleted = data.deleted;
     this._onEditButtonClick = this._onEditButtonClick.bind(this);
   }
 
@@ -23,6 +23,7 @@ export default class Task extends Component {
     this._picture = data.picture;
     this._color = data.color;
     this._repeatingDays = data.repeatingDays;
+    this.deleted = data.deleted;
   }
 
   _isRepeated() {
@@ -39,7 +40,7 @@ export default class Task extends Component {
 
   get template() {
     return `
-    <article class="card card--${this._color} ${this._isRepeated() ? `card--repeat` : ``}">
+    <article class="card card--${this._color}${this._isRepeated() ? ` card--repeat` : ``}">
               
               <form class="card__form" method="get">
                 <div class="card__inner">
@@ -83,7 +84,22 @@ export default class Task extends Component {
                     ${moment(this._dueDate).format(`DD MMMM hh:mm`)}
 </div>
                     <div class="card__hashtag">
-                      <div class="card__hashtag-list">${tags(this._tags)}</div>
+                      <div class="card__hashtag-list">${(this._tags).map((tag)=>{
+    return `<span class="card__hashtag-inner">
+                          <input
+                            type="hidden"
+                            name="hashtag"
+                            value="${tag}"
+                            class="card__hashtag-hidden-input"
+                          />
+                          <button type="button" class="card__hashtag-name">
+                            #${tag}
+                          </button>
+                          <button type="button" class="card__hashtag-delete">
+                            delete
+                          </button>
+                        </span>`;
+  }).join(``)}</div>
                       <label>
                         <input
                           type="text"
@@ -114,7 +130,6 @@ export default class Task extends Component {
           </article>
     `.trim();
   }
-
 
   createListeners() {
     this._element.querySelector(`.card__btn--edit`)

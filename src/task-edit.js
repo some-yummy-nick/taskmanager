@@ -1,6 +1,7 @@
-import {days, tags} from './utils';
+import {days} from './utils';
 import Component from './component';
 import flatpickr from "flatpickr";
+import moment from 'moment';
 
 export default class TaskEdit extends Component {
 
@@ -13,12 +14,14 @@ export default class TaskEdit extends Component {
     this._color = data.color;
     this._repeatingDays = data.repeatingDays;
     this._onSubmit = null;
+    this._onDelete = null;
     this._state.isDate = false;
     this._state.isRepeated = false;
 
     this._onChangeDate = this._onChangeDate.bind(this);
     this._onChangeRepeated = this._onChangeRepeated.bind(this);
     this._onSubmitButtonClick = this._onSubmitButtonClick.bind(this);
+    this._clickOnDelete = this._clickOnDelete.bind(this);
   }
 
   update(data) {
@@ -30,12 +33,17 @@ export default class TaskEdit extends Component {
   }
 
   static createMapper(target) {
+    let fullDate = ``;
     return {
-      hashtag: (value) => target.tags.add(value),
+      hashtag: (value) => target.tags.push(value),
       text: (value) => (target.title = value),
       color: (value) => (target.color = value),
       repeat: (value) => (target.repeatingDays[value] = true),
-      date: (value) => (target.dueDate = value),
+      date: (value) => (fullDate = value),
+      time: (value) => {
+        fullDate += value;
+        target.dueDate = new Date(fullDate);
+      },
     };
   }
 
@@ -65,7 +73,7 @@ export default class TaskEdit extends Component {
     const entry = {
       title: ``,
       color: ``,
-      tags: new Set(),
+      tags: [],
       dueDate: new Date(),
       repeatingDays: {
         'mo': false,
@@ -97,8 +105,16 @@ export default class TaskEdit extends Component {
 
   }
 
+  _clickOnDelete() {
+    return typeof this._onDelete === `function` && this._onDelete();
+  }
+
   set onSubmit(fn) {
     this._onSubmit = fn;
+  }
+
+  set onDelete(fn) {
+    this._onDelete = fn;
   }
 
   get template() {
@@ -152,21 +168,21 @@ export default class TaskEdit extends Component {
                               <input
                                 class="card__date"
                                 type="text"
-     placeholder="${new Date(this._dueDate).toLocaleString(`en-US`, {day: `numeric`})} ${new Date(this._dueDate).toLocaleString(`en-US`, {month: `long`})}" name="date"
-                            value="${new Date(this._dueDate).toLocaleString(`en-US`, {day: `numeric`})} ${new Date(this._dueDate).toLocaleString(`en-US`, {month: `long`})}"/>
-                        </label>
-                        <label class="card__input-deadline-wrap">
-                          <input
-                            class="card__time"
-                            type="text"
-placeholder="${new Date(this._dueDate).toLocaleString(`en-US`, {hour: `2-digit`, minute: `2-digit`})}"  name="time"
-value="${new Date(this._dueDate).toLocaleString(`en-US`, {hour: `2-digit`, minute: `2-digit`})}"
-                          />
-                        </label>
-                      </fieldset>
-
-                      <button class="card__repeat-toggle" type="button">
-                        repeat:<span class="card__repeat-status">${this._state.isRepeated ? `yes` : `no`}</span>
+     placeholder="23 September" name="date"
+                              value="${moment(this._dueDate).format(`DD MMMM`)}"/>
+                          </label>
+                          <label class="card__input-deadline-wrap">
+                            <input
+                              class="card__time"
+                              type="text"
+  placeholder="11:15 PM"  name="time"
+  value="${moment(this._dueDate).format(`LT`)}"
+                            />
+                          </label>
+                        </fieldset>
+  
+                        <button class="card__repeat-toggle" type="button">
+                          repeat:<span class="card__repeat-status">${this._state.isRepeated ? `yes` : `no`}</span>
                         </button>
   
                         <fieldset class="card__repeat-days" ${!this._state.isRepeated && `disabled`}>
@@ -177,7 +193,22 @@ ${days(this._repeatingDays)}
                     </div>
 
                     <div class="card__hashtag">
-                      <div class="card__hashtag-list">${tags(this._tags)}</div>
+                      <div class="card__hashtag-list">${(this._tags).map((tag)=>{
+    return `<span class="card__hashtag-inner">
+                          <input
+                            type="hidden"
+                            name="hashtag"
+                            value="${tag}"
+                            class="card__hashtag-hidden-input"
+                          />
+                          <button type="button" class="card__hashtag-name">
+                            #${tag}
+                          </button>
+                          <button type="button" class="card__hashtag-delete">
+                            delete
+                          </button>
+                        </span>`;
+  }).join(``)}</div>
                       <label>
                         <input
                           type="text"
@@ -301,6 +332,8 @@ ${days(this._repeatingDays)}
         dateFormat: `h:i K`
       });
     }
+    this._element.querySelector(`.card__delete`)
+      .addEventListener(`click`, this._clickOnDelete);
   }
 
   removeListeners() {
