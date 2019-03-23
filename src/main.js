@@ -1,7 +1,8 @@
 import Filter from './filter';
-import getTasks from './get-task';
+import taskCommon from './taskCommon';
 import Task from './task';
 import TaskEdit from './task-edit';
+import statistics from './statistics';
 import moment from 'moment';
 
 const doc = document;
@@ -9,12 +10,6 @@ const filtersContainer = doc.querySelector(`.main__filter`);
 const tasksContainer = doc.querySelector(`.board__tasks`);
 
 const filtersArray = [`all`, `overdue`, `today`, `repeating`];
-
-const taskCommon = [];
-
-for (let i = 0; i < 7; i++) {
-  taskCommon.push(getTasks());
-}
 
 for (let name of filtersArray) {
   const filter = new Filter({title: `${name}`});
@@ -90,3 +85,6 @@ const renderTasks = (tasks) => {
 };
 
 renderTasks(taskCommon);
+document.querySelector(`.statistic__tags-wrap`).classList.remove(`visually-hidden`);
+document.querySelector(`.statistic__colors-wrap`).classList.remove(`visually-hidden`);
+statistics();

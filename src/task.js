@@ -1,4 +1,3 @@
-import {tags} from './utils';
 import Component from './component';
 import moment from 'moment';
 
@@ -85,7 +84,22 @@ export default class Task extends Component {
                     ${moment(this._dueDate).format(`DD MMMM hh:mm`)}
 </div>
                     <div class="card__hashtag">
-                      <div class="card__hashtag-list">${tags(this._tags)}</div>
+                      <div class="card__hashtag-list">${(this._tags).map((tag)=>{
+    return `<span class="card__hashtag-inner">
+                          <input
+                            type="hidden"
+                            name="hashtag"
+                            value="${tag}"
+                            class="card__hashtag-hidden-input"
+                          />
+                          <button type="button" class="card__hashtag-name">
+                            #${tag}
+                          </button>
+                          <button type="button" class="card__hashtag-delete">
+                            delete
+                          </button>
+                        </span>`;
+  }).join(``)}</div>
                       <label>
                         <input
                           type="text"

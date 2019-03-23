@@ -1,4 +1,4 @@
-import {days, tags} from './utils';
+import {days} from './utils';
 import Component from './component';
 import flatpickr from "flatpickr";
 import moment from 'moment';
@@ -35,7 +35,7 @@ export default class TaskEdit extends Component {
   static createMapper(target) {
     let fullDate = ``;
     return {
-      hashtag: (value) => target.tags.add(value),
+      hashtag: (value) => target.tags.push(value),
       text: (value) => (target.title = value),
       color: (value) => (target.color = value),
       repeat: (value) => (target.repeatingDays[value] = true),
@@ -73,7 +73,7 @@ export default class TaskEdit extends Component {
     const entry = {
       title: ``,
       color: ``,
-      tags: new Set(),
+      tags: [],
       dueDate: new Date(),
       repeatingDays: {
         'mo': false,
@@ -193,7 +193,22 @@ ${days(this._repeatingDays)}
                     </div>
 
                     <div class="card__hashtag">
-                      <div class="card__hashtag-list">${tags(this._tags)}</div>
+                      <div class="card__hashtag-list">${(this._tags).map((tag)=>{
+    return `<span class="card__hashtag-inner">
+                          <input
+                            type="hidden"
+                            name="hashtag"
+                            value="${tag}"
+                            class="card__hashtag-hidden-input"
+                          />
+                          <button type="button" class="card__hashtag-name">
+                            #${tag}
+                          </button>
+                          <button type="button" class="card__hashtag-delete">
+                            delete
+                          </button>
+                        </span>`;
+  }).join(``)}</div>
                       <label>
                         <input
                           type="text"

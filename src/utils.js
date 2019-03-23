@@ -47,27 +47,3 @@ export const pickRandom = (arr, count) => {
 export const getRandomInt = (min, max) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
-
-export const tags = (data) => {
-  const tagsArray = pickRandom(Array.from(data), getRandomInt(0, 3));
-  let allTags = ``;
-  for (let tag of tagsArray) {
-    const oneTag = `
-    <span class="card__hashtag-inner">
-                          <input
-                            type="hidden"
-                            name="hashtag"
-                            value="${tag}"
-                            class="card__hashtag-hidden-input"
-                          />
-                          <button type="button" class="card__hashtag-name">
-                            #${tag}
-                          </button>
-                          <button type="button" class="card__hashtag-delete">
-                            delete
-                          </button>
-                        </span>`;
-    allTags += oneTag;
-  }
-  return allTags;
-};
