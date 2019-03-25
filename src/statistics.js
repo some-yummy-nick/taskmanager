@@ -29,7 +29,6 @@ export default function statistics() {
       getChart(newTasks);
     }
   });
-  document.querySelector(`#control__statistic`).click();
 
   getChart(taskCommon);
 }

@@ -37,7 +37,11 @@ export default class Task extends Component {
   set onEdit(fn) {
     this._onEdit = fn;
   }
-
+  _dateFormat() {
+    const taskDate = moment(this._dueDate).format(`D MMMM`);
+    const taskTime = moment(this._dueDate).format(`hh:mm A`);
+    return {taskDate, taskTime};
+  }
   get template() {
     return `
     <article class="card card--${this._color}${this._isRepeated() ? ` card--repeat` : ``}">
@@ -81,10 +85,37 @@ export default class Task extends Component {
                   <div class="card__details">
                   
                     <div class="card__dates">
-                    ${moment(this._dueDate).format(`DD MMMM hh:mm`)}
+                    <button class="card__date-deadline-toggle" type="button">
+                      date: <span class="card__date-status">no</span>
+                    </button>
+
+                    <fieldset class="card__date-deadline" ${this._dueDate ? `` : `disabled`}>
+                      <label class="card__input-deadline-wrap">
+                        <input
+                          class="card__date"
+                          type="text"
+                          placeholder="23 September"
+                          name="date"
+                          value="${this._dueDate ? this._dateFormat().taskDate : ``}"
+                        />
+                      </label>
+                      <label class="card__input-deadline-wrap">
+                        <input
+                          class="card__time"
+                          type="text"
+                          placeholder="11:15 PM"
+                          name="time"
+                          value="${this._dueDate ? this._dateFormat().taskTime : ``}"
+                        />
+                      </label>
+                    </fieldset>
+
+                    <button class="card__repeat-toggle" type="button">
+                      repeat:<span class="card__repeat-status">no</span>
+                    </button>
 </div>
                     <div class="card__hashtag">
-                      <div class="card__hashtag-list">${(this._tags).map((tag)=>{
+                      <div class="card__hashtag-list">${Array.from(this._tags).map((tag)=>{
     return `<span class="card__hashtag-inner">
                           <input
                             type="hidden"
