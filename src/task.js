@@ -13,6 +13,7 @@ export default class Task extends Component {
     this._repeatingDays = data.repeatingDays;
     this._onEdit = null;
     this.deleted = data.deleted;
+    this.isDate = data.isDate;
     this._onEditButtonClick = this._onEditButtonClick.bind(this);
   }
 
@@ -24,6 +25,7 @@ export default class Task extends Component {
     this._color = data.color;
     this._repeatingDays = data.repeatingDays;
     this.deleted = data.deleted;
+    this.isDate = data.isDate;
   }
 
   _isRepeated() {
@@ -37,6 +39,7 @@ export default class Task extends Component {
   set onEdit(fn) {
     this._onEdit = fn;
   }
+
   _dateFormat() {
     const taskDate = moment(this._dueDate).format(`D MMMM`);
     const taskTime = moment(this._dueDate).format(`hh:mm A`);
@@ -83,13 +86,13 @@ export default class Task extends Component {
 
                 <div class="card__settings">
                   <div class="card__details">
-                  
-                    <div class="card__dates">
-                    <button class="card__date-deadline-toggle" type="button">
-                      date: <span class="card__date-status">no</span>
-                    </button>
-
-                    <fieldset class="card__date-deadline" ${this._dueDate ? `` : `disabled`}>
+                  ${this.isDate ? `
+                   <div class="card__dates">
+                      <button class="card__date-deadline-toggle" type="button">
+                        date: <span class="card__date-status">no</span>
+                      </button>
+  
+                      <fieldset class="card__date-deadline" ${this._dueDate ? `` : `disabled`}>
                       <label class="card__input-deadline-wrap">
                         <input
                           class="card__date"
@@ -97,15 +100,15 @@ export default class Task extends Component {
                           placeholder="23 September"
                           name="date"
                           value="${this._dueDate ? this._dateFormat().taskDate : ``}"
-                        />
-                      </label>
-                      <label class="card__input-deadline-wrap">
-                        <input
-                          class="card__time"
-                          type="text"
-                          placeholder="11:15 PM"
-                          name="time"
-                          value="${this._dueDate ? this._dateFormat().taskTime : ``}"
+                          />
+                        </label>
+                        <label class="card__input-deadline-wrap">
+                          <input
+                            class="card__time"
+                            type="text"
+                            placeholder="11:15 PM"
+                            name="time"
+                            value="${this._dueDate ? this._dateFormat().taskTime : ``}"
                         />
                       </label>
                     </fieldset>
@@ -114,6 +117,8 @@ export default class Task extends Component {
                       repeat:<span class="card__repeat-status">no</span>
                     </button>
 </div>
+                  ` : ``}
+                     
                     <div class="card__hashtag">
                       <div class="card__hashtag-list">${Array.from(this._tags).map((tag)=>{
     return `<span class="card__hashtag-inner">

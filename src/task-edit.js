@@ -16,11 +16,9 @@ export default class TaskEdit extends Component {
     this._repeatingDays = data.repeatingDays;
     this._onSubmit = null;
     this._onDelete = null;
-    this._state.isDate = false;
+    this._onDate = null;
     this._state.isRepeated = false;
-    this._time = null;
-    this._date = null;
-
+    this.isDate = data.isDate;
     this._onChangeDate = this._onChangeDate.bind(this);
     this._onChangeRepeated = this._onChangeRepeated.bind(this);
     this._onSubmitButtonClick = this._onSubmitButtonClick.bind(this);
@@ -48,10 +46,11 @@ export default class TaskEdit extends Component {
   }
 
   _onChangeDate() {
-    this._state.isDate = !this._state.isDate;
+    this.isDate = !this.isDate;
     this.removeListeners();
     this._partialUpdate();
     this.createListeners();
+    return typeof this._onDate === `function` && this._onDate();
   }
 
   _onChangeRepeated() {
@@ -113,6 +112,10 @@ export default class TaskEdit extends Component {
 
   set onSubmit(fn) {
     this._onSubmit = fn;
+  }
+
+  set onDate(fn) {
+    this._onDate = fn;
   }
 
   set onDelete(fn) {
@@ -197,10 +200,10 @@ export default class TaskEdit extends Component {
                   <div class="card__details">
                     <div class="card__dates">
                       <button class="card__date-deadline-toggle" type="button">
-                        date: <span class="card__date-status">${this._state.isDate ? `yes` : `no`}</span>
+                        date: <span class="card__date-status">${this.isDate ? `yes` : `no`}</span>
                         </button>
   
-                        <fieldset class="card__date-deadline" ${!this._state.isDate && `disabled`}>
+                        <fieldset class="card__date-deadline" ${!this.isDate && `disabled`}>
                            
                            <label class="card__input-deadline-wrap">
                             <input

@@ -5,7 +5,7 @@ import statistics from './statistics';
 import moment from 'moment';
 import API from './api';
 
-const AUTHORIZATION = `Basic A8XoP3pLaHAAw1Gp=`;
+const AUTHORIZATION = `Basic A8XoP3pLaHAAw1Gk=`;
 const END_POINT = `https://es8-demo-srv.appspot.com/task-manager`;
 const doc = document;
 const filtersContainer = doc.querySelector(`.main__filter`);
@@ -107,7 +107,20 @@ const renderTasks = (tasks) => {
           tasksContainer.replaceChild(taskComponent.element, editTaskComponent.element);
           editTaskComponent.unrender();
         })
-        .catch(()=>{
+        .catch(() => {
+          unblock();
+        });
+    };
+
+    editTaskComponent.onDate = () => {
+      task.isDate = !task.isDate;
+
+      api.updateTask({id: task.id, data: task.toRAW()})
+        .then((newTask) => {
+          taskComponent.update(newTask);
+          taskComponent.render();
+        })
+        .catch(() => {
           unblock();
         });
     };
@@ -119,7 +132,7 @@ const renderTasks = (tasks) => {
         .then((tasksNew) => {
           renderTasks(tasksNew);
         })
-        .catch(()=>{
+        .catch(() => {
           unblock();
         });
     };

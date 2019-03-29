@@ -9,6 +9,7 @@ export default class ModelTask {
     this.color = data[`color`];
     this.isFavorite = Boolean(data[`is_favorite`]);
     this.isDone = Boolean(data[`is_done`]);
+    this.isDate = Boolean(data[`is_date`]);
   }
 
   toRAW() {
@@ -22,6 +23,7 @@ export default class ModelTask {
       'color': this.color,
       'is_favorite': this.isFavorite,
       'is_done': this.isDone,
+      'is_date': this.isDate,
     };
   }
 
